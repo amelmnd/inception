@@ -1,4 +1,4 @@
-version: 2.27 
+version: "2.27" 
 # version de docker compose obtenue grace a la commande 
 # docker compose version
 
@@ -8,46 +8,46 @@ services:
     container_name: mariadb
     env_file:
       - .env
-    network:
-      - wordpress-mariadb
+    # network:
+    #   - wordpress-mariadb
     ports:
-      3306:3306
+      - "3306:3306"
     restart: always
     volumes:
-      - mariadb:/var/lib/mysql/$DB_NAME
+      - mariadb_data:/var/lib/mysql
   
-  wordpress:
-    build: ./requirements/wordpress
-    container_name: wordpress
-    depends_on:
-      - mariadb
-    env_file:
-      - .env
-    network:
-      - wordpress-mariadb
-      - wordpress-nginx
-    ports:
-      - 9000-9000
-    restart: always
-    volumes:
-      - wordpress:wordpress
+  # wordpress:
+  #   build: ./requirements/wordpress
+  #   container_name: wordpress
+  #   depends_on:
+  #     - mariadb
+  #   env_file:
+  #     - .env
+  #   network:
+  #     - wordpress-mariadb
+  #     - wordpress-nginx
+  #   ports:
+  #     - 9000-9000
+  #   restart: always
+  #   volumes:
+  #     - wordpress:wordpress
 
-  nginx:
-    build: ./requirements/nginx
-    container_name: nginx
-    depends_on:
-      - wordpress
-    env_file:
-      - .env
-    network:
-      wordpress-nginx
-    ports:
-      443:443
-    restart: always
-    hostname: myhostname
-    networks:
-           default:
-                aliases:
-                   wordpress-nginx
-  volume:
-  
+  # nginx:
+  #   build: ./requirements/nginx
+  #   container_name: nginx
+  #   depends_on:
+  #     - wordpress
+  #   env_file:
+  #     - .env
+  #   network:
+  #     wordpress-nginx
+  #   ports:
+  #     443:443
+  #   restart: always
+  #   hostname: myhostname
+  #   networks:
+  #          default:
+  #               aliases:
+  #                  wordpress-nginx
+volumes:
+  mariadb_data:
