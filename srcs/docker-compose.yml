@@ -5,49 +5,38 @@ version: "2.27"
 services:
   maria_db:
     build: ./requirements/mariadb
-    container_name: mariadb
+    container_name: mariadb_container
     env_file:
       - .env
-    # network:
-    #   - wordpress-mariadb
-    ports:
-      - "3306:3306"
+    # ports:
+    #   - "3306:3306"
     restart: always
     volumes:
       - mariadb_data:/var/lib/mysql
   
-  # wordpress:
-  #   build: ./requirements/wordpress
-  #   container_name: wordpress
-  #   depends_on:
-  #     - mariadb
-  #   env_file:
-  #     - .env
-  #   network:
-  #     - wordpress-mariadb
-  #     - wordpress-nginx
-  #   ports:
-  #     - 9000-9000
-  #   restart: always
-  #   volumes:
-  #     - wordpress:wordpress
+  wordpress:
+    build: ./requirements/wordpress
+    container_name: wordpress_container
+    depends_on:
+      - mariadb
+    env_file:
+      - .env
+    # ports:
+    #   - 9000-9000
+    restart: always
+    volumes:
+      - wordpress:wordpress
 
-  # nginx:
-  #   build: ./requirements/nginx
-  #   container_name: nginx
-  #   depends_on:
-  #     - wordpress
-  #   env_file:
-  #     - .env
-  #   network:
-  #     wordpress-nginx
-  #   ports:
-  #     443:443
-  #   restart: always
-  #   hostname: myhostname
-  #   networks:
-  #          default:
-  #               aliases:
-  #                  wordpress-nginx
+  nginx:
+    build: ./requirements/nginx
+    container_name: nginx_container
+    depends_on:
+      - wordpress
+    env_file:
+      - .env
+    ports:
+      443:443
+    restart: always
+ 
 volumes:
   mariadb_data:
