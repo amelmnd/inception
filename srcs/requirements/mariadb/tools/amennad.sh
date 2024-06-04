@@ -1,39 +1,38 @@
 #!/bin/sh
-apk add mariadb mariadb-client
 
-# le dossier ou mysql va tourner
+apk add mariadb mariadb-client
 if [ ! -d "/run/mysqld" ]; then
 	mkdir -p /run/mysqld
 	chown -R mysql:mysql /run/mysqld
 fi
 
-# Si on a pas le dossier qui contient la base de donne, initialise mariadb
-# base de donne.
 if [ ! -d "/var/lib/mysql/mysql" ]; then
 	mkdir -p "/var/lib/mysql/"
 	chown -R mysql:mysql /var/lib/mysql
 	mysql_install_db --user=mysql --ldata=/var/lib/mysql
 fi
 
-# Si on a jamais creer notre base de donnee, alors il faut la creer
 if [ ! -d "/var/lib/mysql/mysql/$DB_NAME" ]; then
-    sqlfile=$(mktemp)
-    echo "CREATE DATABASE $DB_NAME" >> "$sqlfile"
-    echo "USE $DB_NAME;" >> "$sqlfile"
-    echo "CREATE TABLE IF NOT EXITS $DB_NAME_TAB (" >> "$sqlfile"
-    echo "  id INT AUTO_INCREMENT PRIMARY KEY," >> "$sqlfile"
-    echo "  name VARCHAR(100) NOT NULL" >> "$sqlfile"
-    echo ");" >> "$sqlfile"
-    echo "CREATE USER  $DB_USER " >> "$sqlfile"
-    echo "IDENTIFIED by '$DB_U_PWD';" >> "$sqlfile"
-    echo "is creat"
-    /usr/bin/mysqld --user=mysql \
-        --bootstrap \
-        --verbose=0 \
-        --skip-name-resolve \
-        --skip-networking=0 < "$sqlfile"
+sqlfile=$(mktemp)
 
+cat << EOF > "$sqlfile"
+USE mysql;
+FLUSH PRIVILEGES;
+GRANT ALL ON *.* TO 'root'@'localhost' IDENTIFIED BY '$DB_ADM_PASS' WITH GRANT OPTION ;
+SET PASSWORD FOR 'root'@'localhost'=PASSWORD('$DB_ADM_PASS');
+DROP DATABASE IF EXISTS test;
+CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE utf8_general_ci;
+CREATE OR REPLACE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_USER_PWD';
+GRANT ALL ON $DB_NAME.* TO '$DB_USER' IDENTIFIED BY '$DB_USER_PWD';
+FLUSH PRIVILEGES;
+EOF
+/usr/bin/mysqld --user=mysql \
+	--bootstrap \
+	--verbose=0 \
+	--skip-name-resolve \
+	--skip-networking=0 < "$sqlfile"
+# rm -f "$sqlfile"
 fi
 
-# Et enfin lance mysql. cette commande tourne jusqu'a l'arret du conteneur
+
 exec /usr/bin/mysqld --user=mysql --console --skip-name-resolve --skip-networking=0
