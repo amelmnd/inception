@@ -25,10 +25,13 @@ wget \
 chmod +x /usr/bin/wp
 
 ln -sf /usr/bin/php83 /usr/bin/php
-fi
-wp config create --dbname=wordpress --dbuser=user --dbpass=password --dbhost=localhost --dbprefix=wp_
+
+# wp core download --allow-root
+wp config create --dbhost=mariadb:3306 --dbname="$DB_NAME" --dbuser="$DB_USER" --dbpass="$DB_USER_PWD"--dbprefix=wp_
+wp core config --dbhost=mariadb:3306 --dbname="$DB_NAME" --dbuser="$DB_USER" --dbpass="$DB_USER_PWD" --allow-root
 wp core install --url=${DOMAIN_NAME} --title="Inception" --admin_user=${WP_ADMIN} --admin_password=${WP_ADMIN_PWD} --admin_email=${WP_ADMIN_EMAIL}
-wp --allow-root user create ${MDB_USER} ${WP_USER_EMAIL} --role="author" --user_pass=${MDB_USER_PWD}
+wp user create ${WP_USER_NAME} ${WP_USER_EMAIL} --role="author" --user_pass=${WP_USER_PASS} --allow-root
 wp theme install the-bootstrap-blog --activate
+fi
 
 php-fpm83 -F
