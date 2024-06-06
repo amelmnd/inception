@@ -12,12 +12,6 @@ ORIGIN = main.c
 
 SRC_PATH	:= src/
 
-# FOLDER & FILES
-# PATH_DEV = $(addprefix $(DIR_X), $(SRCS_Y))
-# DIR_DEV = FOLDER/
-# SRCS_DEV = FILE.c \
-
-# FILES = $(PATH_X)
 FILES = $(ORIGIN)
 
 SRCS := $(addprefix $(SRC_PATH), $(FILES))
@@ -27,7 +21,8 @@ all: $(NAME)
 
 
 $(NAME): 
-	docker images
+	cd srcs
+	docker-compose up --build
 	@echo "$(COLOR_MAGENTA)docker exec $(NAME) generate 🌸$(END_COLOR)"
 
 
@@ -35,13 +30,14 @@ $(NAME):
 
 # Clean
 clean:
-	@cd ./include/libft; make clean
-	@rm -rf $(OBJS)
+	@docker stop $(docker ps -aq)
+	docker rm $(docker ps -aq)
 	@echo "$(COLOUR_BLUE) clean 🐟$(END_COLOR)"
 
 fclean : clean
-	@cd ./include/libft && make fclean
-	@rm -rf $(NAME)
+	@docker rmi $(docker images -q) &&
+	docker volume rm $(docker volume ls -q)&&
+	docker network prune -f&&
 	@echo "$(COLOUR_BLUE) fclean 🐳$(END_COLOR)"
 
 re:fclean all

@@ -6,7 +6,7 @@ services:
       - .env
     restart: always
     volumes:
-      - ~/data/mariadb:/var/lib/mysql
+      - ~/data/mariadb:/var/lib/mysql/$DB_NAME
   
   wordpress:
     build: ./requirements/wordpress

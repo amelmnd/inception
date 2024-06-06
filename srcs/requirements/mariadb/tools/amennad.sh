@@ -13,26 +13,25 @@ if [ ! -d "/var/lib/mysql/mysql" ]; then
 fi
 
 if [ ! -d "/var/lib/mysql/mysql/$DB_NAME" ]; then
-sqlfile=$(mktemp)
+	sqlfile=$(mktemp)
 
 cat << EOF > "$sqlfile"
 USE mysql;
 FLUSH PRIVILEGES;
-GRANT ALL ON *.* TO 'root'@'localhost' IDENTIFIED BY '$DB_ADM_PASS' WITH GRANT OPTION ;
-SET PASSWORD FOR 'root'@'localhost'=PASSWORD('$DB_ADM_PASS');
+GRANT ALL ON *.* TO 'root'@'localhost' IDENTIFIED BY '$DB_ROOT_PWD' WITH GRANT OPTION ;
+SET PASSWORD FOR 'root'@'localhost'=PASSWORD('$DB_ROOT_PWD');
 DROP DATABASE IF EXISTS test;
 CREATE DATABASE IF NOT EXISTS $DB_NAME CHARACTER SET utf8 COLLATE utf8_general_ci;
 CREATE OR REPLACE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_USER_PWD';
 GRANT ALL ON $DB_NAME.* TO '$DB_USER' IDENTIFIED BY '$DB_USER_PWD';
 FLUSH PRIVILEGES;
 EOF
-/usr/bin/mysqld --user=mysql \
-	--bootstrap \
-	--verbose=0 \
-	--skip-name-resolve \
-	--skip-networking=0 < "$sqlfile"
-# rm -f "$sqlfile"
-fi
+	/usr/bin/mysqld --user=mysql \
+		--bootstrap \
+		--verbose=0 \
+		--skip-name-resolve \
+		--skip-networking=0 < "$sqlfile"
 
+fi
 
 exec /usr/bin/mysqld --user=mysql --console --skip-name-resolve --skip-networking=0
