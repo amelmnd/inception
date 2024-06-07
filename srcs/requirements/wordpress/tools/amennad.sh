@@ -27,7 +27,7 @@ if [ ! -e "/var/www/wordpress/index.php" ]; then
 	ln -sf /usr/bin/php83 /usr/bin/php
 
 	wp config create --dbname="$DB_NAME" --dbuser="$DB_USER" --dbpass="$DB_USER_PWD" --dbhost="mariadb:3306" --path="/var/www/wordpress"
-	wp core install --url="$DOMAIN_NAME" --title="titre" --admin_user="$WP_ADMIN_NAME" --admin_password="$WP_ADMIN_PWD" --admin_email="$WP_ADMIN_EMAIL" --path="/var/www/wordpress" --skip-email
+	wp core install --url="$DOMAIN_NAME" --title="Inception" --admin_user="$WP_ADMIN_NAME" --admin_password="$WP_ADMIN_PWD" --admin_email="$WP_ADMIN_EMAIL" --path="/var/www/wordpress" --skip-email
 	wp user create "$WP_USER_NAME" "$WP_USER_EMAIL" --user_pass="$WP_USER_PASS" --role="author" --path="/var/www/wordpress"
 	wp theme install astra --activate
 
