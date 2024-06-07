@@ -20,7 +20,7 @@ build:
 
 clean: stop
 	@docker rm $$(docker ps -qa) || true
-	@rm -rf ~./amennad/data || true
+	@rm -rf ~/amennad/data || true
 	@docker rmi -f $$(docker images -qa) || true
 	@docker volume rm $$(docker volume ls -q) || true
 	@docker network rm $$(docker network ls -q) || true
