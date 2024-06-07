@@ -1,46 +1,35 @@
-# COLOR MAKEFILE
-COLOUR_GREEN=\033[0;32m
-COLOUR_RED=\033[0;31m
-COLOUR_BLUE=\033[0;36m
-COLOUR_YELLOW = \033[0;93m
-COLOUR_MAGENTA = \033[0;95m
-END_COLOR=\033[0m
 
-# VAR
-NAME = inception
-ORIGIN = main.c
+all: up
 
-SRC_PATH	:= src/
-
-FILES = $(ORIGIN)
-
-SRCS := $(addprefix $(SRC_PATH), $(FILES))
-
-# RULES
-all: $(NAME)
+up:
+	@cd srcs && docker-compose up --build -d
+	@docker-compose -f ./srcs/docker-compose.yml start
 
 
-$(NAME): 
-	cd srcs
-	docker-compose up --build
-	@echo "$(COLOR_MAGENTA)docker exec $(NAME) generate 🌸$(END_COLOR)"
+down:
+	@docker-compose -f ./srcs/docker-compose.yml down
 
+stop:
+	@docker-compose -f ./srcs/docker-compose.yml stop
 
-	rm -rf for_dev
+start:
+	@docker-compose -f ./srcs/docker-compose.yml start
 
-# Clean
-clean:
-	@docker stop $(docker ps -aq)
-	docker rm $(docker ps -aq)
-	@echo "$(COLOUR_BLUE) clean 🐟$(END_COLOR)"
+build:
+	@docker-compose -f ./srcs/docker-compose.yml build
 
-fclean : clean
-	@docker rmi $(docker images -q) &&
-	docker volume rm $(docker volume ls -q)&&
-	docker network prune -f&&
-	@echo "$(COLOUR_BLUE) fclean 🐳$(END_COLOR)"
+clean: stop
+	@docker rm $$(docker ps -qa) || true
+	@rm -rf ~/amennad/data || true
+	@docker rmi -f $$(docker images -qa) || true
+	@docker volume rm $$(docker volume ls -q) || true
+	@docker network rm $$(docker network ls -q) || true
 
-re:fclean all
-	@echo "$(COLOUR_MAGENTA)make re OK 🌸$(END_COLOR)"
+prune: clean
+	@docker system prune -a --volumes -f
 
-.PHONY: all clean fclean re run libft debugv debugfa the_end
+fclean: prune
+
+re: fclean up
+
+.phony: all, up, down, stop, start, build, clean, prune, fclean
