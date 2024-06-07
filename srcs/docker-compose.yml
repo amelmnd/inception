@@ -6,7 +6,9 @@ services:
       - .env
     restart: always
     volumes:
-      - ~/data/mariadb:/var/lib/mysql/$DB_NAME
+      - mariadb:/var/lib/mysql/$DB_NAME
+    network:
+      - inception
   
   wordpress:
     build: ./requirements/wordpress
@@ -17,7 +19,9 @@ services:
       - .env
     restart: always
     volumes:
-      - ~/data/wordpress:/var/www/wordpress
+      - wordpress:/var/www/wordpress
+    network:
+      - inception
 
   nginx:
     build: ./requirements/nginx
@@ -29,5 +33,14 @@ services:
     ports:
       - 443:443
     volumes:
-      - ~/data/wordpress:/var/www/wordpress
+      - wordpress:/var/www/wordpress
     restart: always
+    network:
+      - inception
+
+volume:
+  mariadb:
+  wordpress:
+
+network:
+  inception:
