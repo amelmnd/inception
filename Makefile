@@ -3,7 +3,7 @@ all: up
 
 up:
 	@cd srcs && docker-compose up --build -d
-	@docker-compose -f ./srcs/docker-compose.yml start
+	@docker-compose -f docker-compose.yml start
 
 
 down:
