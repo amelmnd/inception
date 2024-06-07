@@ -6,10 +6,10 @@ services:
       - .env
     restart: always
     volumes:
-      - mariadb:/var/lib/mysql/$DB_NAME
+      - ./amennad/data/mariadb:/var/lib/mysql/$DB_NAME
     network:
       - inception
-  
+
   wordpress:
     build: ./requirements/wordpress
     container_name: wordpress
@@ -19,7 +19,7 @@ services:
       - .env
     restart: always
     volumes:
-      - wordpress:/var/www/wordpress
+      - ./amennad/data/wordpress:/var/www/wordpress
     network:
       - inception
 
@@ -33,7 +33,7 @@ services:
     ports:
       - 443:443
     volumes:
-      - wordpress:/var/www/wordpress
+      - ./amennad/data/wordpress:/var/www/wordpress
     restart: always
     network:
       - inception
